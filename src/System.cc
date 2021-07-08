@@ -649,6 +649,53 @@ void System::SaveKeyFrameTrajectoryEuRoC(const string &filename)
     f.close();
 }
 
+void System::SaveMapPoints(const string &filename)
+{
+    cout << endl << "Saving map points to " << filename << " ..." << endl;
+    vector<Map*> vpMaps = mpAtlas->GetAllMaps();
+
+    Map* pBiggerMap;
+    int numMaxKFs = 0;
+    for(Map* pMap :vpMaps)
+    {
+        if(pMap->GetAllKeyFrames().size() > numMaxKFs)
+        {
+            numMaxKFs = pMap->GetAllKeyFrames().size();
+            pBiggerMap = pMap;
+        }
+    }
+
+    vector<KeyFrame*> vpKFs = pBiggerMap->GetAllKeyFrames();
+    sort(vpKFs.begin(),vpKFs.end(),KeyFrame::lId);
+
+
+    ofstream f;
+    f.open(filename.c_str());
+    f << fixed;
+
+    for(size_t i=0; i<vpKFs.size(); i++)
+    {
+        KeyFrame* pKF = vpKFs[i];
+
+        if(pKF->isBad())
+            continue;
+        if (mSensor == IMU_MONOCULAR || mSensor == IMU_STEREO)
+        {
+			set<MapPoint*> spMP = pKF->GetMapPoints();
+			f << setprecision(6) << 1e9*pKF->mTimeStamp  << " " << spMP.size() << " ";
+			for (MapPoint* pMP : spMP)
+			{
+                cv::Mat P3DW = pMP->GetWorldPos();
+			    f <<  setprecision(9) << P3DW.at<float>(0) << " " << P3DW.at<float>(1) << " " << P3DW.at<float>(2) << " ";
+			}
+            f << endl;
+        }
+        else
+		    cout << "Error" << endl;
+    }
+    f.close();
+}
+
 void System::SaveTrajectoryKITTI(const string &filename)
 {
     cout << endl << "Saving camera trajectory to " << filename << " ..." << endl;

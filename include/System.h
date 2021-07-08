@@ -38,6 +38,8 @@
 #include "Viewer.h"
 #include "ImuTypes.h"
 #include "Config.h"
+#include "KeyFrame.h"
+#include "MapPoint.h"
 
 
 namespace ORB_SLAM3
@@ -76,6 +78,8 @@ class Atlas;
 class Tracking;
 class LocalMapping;
 class LoopClosing;
+class KeyFrame;
+class MapPoint;
 
 class System
 {
@@ -149,6 +153,8 @@ public:
 
     void SaveTrajectoryEuRoC(const string &filename);
     void SaveKeyFrameTrajectoryEuRoC(const string &filename);
+    void SaveMapPoints(const string &filename);
+
 
     // Save camera trajectory in the KITTI dataset format.
     // Only for stereo and RGB-D. This method does not work for monocular.
